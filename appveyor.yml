@@ -118,7 +118,7 @@ after_build:
           Copy-Item -path "$CMAKE_SOURCE_DIR/README.md" -destination $RELEASE_DIST
           # copy all the dll dependencies to the release folder
           # hardcoded list because we don't build static and determining the list of dlls from the binary is a pain.
-          $MingwDLLs = "Qt5Core.dll","Qt5Widgets.dll","Qt5Gui.dll","Qt5OpenGL.dll",
+          $MingwDLLs = "Qt5Core.dll","Qt5Widgets.dll","Qt5Gui.dll","Qt5OpenGL.dll","Qt5WinExtras.dll"
                        # QT dll dependencies
                        "libbz2-*.dll","libicudt*.dll","libicuin*.dll","libicuuc*.dll","libffi-*.dll",
                        "libfreetype-*.dll","libglib-*.dll","libgobject-*.dll","libgraphite2.dll","libiconv-*.dll",
