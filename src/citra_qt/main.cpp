@@ -93,12 +93,14 @@ GMainWindow::GMainWindow() : config(new Config()), emu_thread(nullptr) {
     Pica::g_debug_context = Pica::DebugContext::Construct();
     setAcceptDrops(true);
     ui.setupUi(this);
+    installEventFilter(this);
     statusBar()->hide();
 
     InitializeWidgets();
     InitializeDebugWidgets();
     InitializeRecentFileMenuActions();
     InitializeHotkeys();
+    InitializeAnimations();
 
     SetDefaultUIGeometry();
     RestoreUIState();
@@ -252,6 +254,22 @@ void GMainWindow::InitializeHotkeys() {
             SLOT(OnStartGame()));
     connect(GetHotkey("Main Window", "Swap Screens", render_window), SIGNAL(activated()), this,
             SLOT(OnSwapScreens()));
+}
+
+void GMainWindow::InitializeAnimations() {
+    menubar_animation = new QPropertyAnimation(menuBar(), "opacity");
+    menubar_effect = new QGraphicsOpacityEffect(menuBar());
+
+    menubar_effect->setOpacity(1);
+    menuBar()->setGraphicsEffect(menubar_effect);
+    menubar_animation->setTargetObject(menubar_effect);
+
+    connect(&menubar_timer, &QTimer::timeout, [this] { AnimateMenubar(false); });
+    connect(menubar_animation, &QPropertyAnimation::finished, [this] {
+        if (!menubar_effect->opacity()) {
+            menuBar()->hide();
+        }
+    });
 }
 
 void GMainWindow::SetDefaultUIGeometry() {
@@ -697,6 +715,26 @@ void GMainWindow::UpdateStatusBar() {
     emu_frametime_label->setVisible(true);
 }
 
+void GMainWindow::AnimateMenubar(bool show) {
+    menubar_timer.stop();
+    menubar_animation->stop();
+
+    if (show && menubar_effect->opacity() < 1) {
+        menubar_animation->setEasingCurve(QEasingCurve::OutQuad);
+        menubar_animation->setDuration(2000);
+        menubar_animation->setStartValue(menubar_effect->opacity());
+        menubar_animation->setEndValue(1);
+        menubar_animation->start();
+        menuBar()->show();
+    } else {
+        menubar_animation->setEasingCurve(QEasingCurve::InCirc);
+        menubar_animation->setDuration(3000);
+        menubar_animation->setStartValue(menubar_effect->opacity());
+        menubar_animation->setEndValue(0);
+        menubar_animation->start();
+    }
+}
+
 void GMainWindow::OnCoreError(Core::System::ResultStatus result, std::string details) {
     QMessageBox::StandardButton answer;
     QString status_message;
@@ -822,6 +860,18 @@ void GMainWindow::dragEnterEvent(QDragEnterEvent* event) {
 
 void GMainWindow::dragMoveEvent(QDragMoveEvent* event) {
     event->acceptProposedAction();
+}
+
+bool GMainWindow::eventFilter(QObject* obj, QEvent* event) {
+    QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
+    if ((mouse && mouse->y() < 0 && mouse->x() > 0) || menuBar()->underMouse()) {
+        AnimateMenubar(true);
+    } else if (event->type() == QEvent::HoverMove) {
+        if (menuBar()->isVisible() && !menubar_timer.isActive()) {
+            menubar_timer.start(3000);
+        }
+    }
+    return QMainWindow::eventFilter(obj, event);
 }
 
 bool GMainWindow::ConfirmChangeGame() {

@@ -8,6 +8,8 @@
 #include <memory>
 #include <QMainWindow>
 #include <QTimer>
+#include <QPropertyAnimation>
+#include <QGraphicsOpacityEffect>
 #include "core/core.h"
 #include "ui_main.h"
 
@@ -69,6 +71,7 @@ private:
     void InitializeDebugWidgets();
     void InitializeRecentFileMenuActions();
     void InitializeHotkeys();
+    void InitializeAnimations();
 
     void SetDefaultUIGeometry();
     void RestoreUIState();
@@ -133,6 +136,7 @@ private slots:
 
 private:
     void UpdateStatusBar();
+    void AnimateMenubar(bool show);
 
     Ui::MainWindow ui;
 
@@ -165,10 +169,16 @@ private:
 
     QAction* actions_recent_files[max_recent_files_item];
 
+    // Animations
+    QTimer menubar_timer;
+    QPropertyAnimation* menubar_animation;
+    QGraphicsOpacityEffect* menubar_effect;
+
 protected:
     void dropEvent(QDropEvent* event) override;
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dragMoveEvent(QDragMoveEvent* event) override;
+    bool eventFilter(QObject* obj, QEvent* ev) override;
 };
 
 #endif // _CITRA_QT_MAIN_HXX_
