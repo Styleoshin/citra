@@ -126,6 +126,7 @@ private slots:
     void OnStartGame();
     void OnPauseGame();
     void OnStopGame();
+    void OnRestartGame();
     /// Called whenever a user selects a game in the game list widget.
     void OnGameListLoadFile(QString game_path);
     void OnGameListOpenSaveFolder(u64 program_id);
@@ -156,6 +157,8 @@ private:
     void UpdateStatusBar();
 
     Ui::MainWindow ui;
+
+    QString game_path_launched;
 
     GRenderWindow* render_window;
     GameList* game_list;

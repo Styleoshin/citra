@@ -2,6 +2,11 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
+set(windows_files)
+
+if(WIN32)
+    list(APPEND windows_files "windows_extras.cpp" "windows_extras.h")
+endif()
 
 add_executable(citra-qt
     Info.plist
@@ -65,6 +70,7 @@ add_executable(citra-qt
     util/spinbox.h
     util/util.cpp
     util/util.h
+    ${windows_files}
 )
 
 set(UIS
