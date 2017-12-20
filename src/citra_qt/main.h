@@ -30,6 +30,7 @@ class QProgressBar;
 class RegistersWidget;
 class Updater;
 class WaitTreeWidget;
+class WindowsExtras;
 
 class GMainWindow : public QMainWindow {
     Q_OBJECT
@@ -48,6 +49,7 @@ class GMainWindow : public QMainWindow {
 public:
     void filterBarSetChecked(bool state);
     void UpdateUITheme();
+    void ShowWindowsExtras();
     GMainWindow();
     ~GMainWindow();
 
@@ -75,6 +77,7 @@ private:
     void InitializeDebugWidgets();
     void InitializeRecentFileMenuActions();
     void InitializeHotkeys();
+    void InitializeWindowsExtras();
 
     void SetDefaultUIGeometry();
     void RestoreUIState();
@@ -194,6 +197,10 @@ private:
     bool defer_update_prompt = false;
 
     QAction* actions_recent_files[max_recent_files_item];
+
+#ifdef _WIN32
+    WindowsExtras* windows_extras; // Used for Thumbnail Toolbar
+#endif
 
 protected:
     void dropEvent(QDropEvent* event) override;
